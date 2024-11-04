@@ -28,8 +28,8 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     myRay.direction = normalize(v);
     myRay.origin = vec3<f32>(0.0, 0.0, 0.0);
 
-    let purple = vec3<f32>(0.5, 0.0, 1.0);
-    var pixel_color: vec3<f32> = purple; // "background"
+    let background = vec4<f32>(0.0, 0.0, 0.0, 1.0);
+    var pixel_color: vec4<f32> = background;
 
     let is_in_cube_point = myRay.direction + vec3<f32>(offset_x, offset_y, 0.0);
     let scaled_point = is_in_cube_point * 0.01;
@@ -39,21 +39,11 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     let m = 0;
     let spheric_coords = to_spheric_coords(scaled_point);
     let my_prob = prob(spheric_coords, n, l, m);
-    if my_prob > 0.02 {
-        let red = vec3<f32>(my_prob, 0.0, 0.0);
-        pixel_color = red;
-    }
-    //  else {
-    //     let red = vec3<f32>(1.0, 0.0, 0.0);
-    //     pixel_color = red;
 
-    // }
+    let wave_color = vec4<f32>(0.5, 0.5, 1.0, my_prob);
+    pixel_color = mix(background, wave_color, wave_color.a);
 
-    textureStore(color_buffer, screen_pos, vec4<f32>(pixel_color, 1.0));
-}
-
-
-
+    textureStore(color_buffer, screen_pos, pixel_color);
 }
 
 fn to_spheric_coords(coords: vec3<f32>) -> SphericCoords {
