@@ -32,11 +32,27 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     var pixel_color: vec3<f32> = purple; // "background"
 
     let is_in_cube_point = myRay.direction + vec3<f32>(offset_x, offset_y, 0.0);
+    let scaled_point = is_in_cube_point * 0.01;
     // let is_in_cube_point = myRay.direction + vec3<f32>(f32(horizontal_coefficient), f32(vertical_coefficient), 0.0);
-    if is_in_create_cube(is_in_cube_point) {
+    if is_in_create_cube(scaled_point) {
         let cyan = vec3<f32>(0.0, 1.0, 1.0);
         pixel_color = cyan;
     }
+
+    let n: u32 = 1;
+    let l: u32 = 0;
+    let m = 0;
+    let spheric_coords = to_spheric_coords(scaled_point);
+    let my_prob = prob(spheric_coords, n, l, m);
+    if my_prob > 0.02 {
+        let red = vec3<f32>(my_prob, 0.0, 0.0);
+        pixel_color = red;
+    }
+    //  else {
+    //     let red = vec3<f32>(1.0, 0.0, 0.0);
+    //     pixel_color = red;
+
+    // }
 
     textureStore(color_buffer, screen_pos, vec4<f32>(pixel_color, 1.0));
 }
@@ -66,8 +82,7 @@ fn is_in_create_cube(point: vec3<f32>) -> bool {
     cube.min_z = min + pos_z;
     cube.max_z = max + pos_z;
 
-    let point2 = point * 0.08;
-    return is_in_cube(point2, cube);
+    return is_in_cube(point, cube);
 }
 
 fn is_in_cube(point: vec3<f32>, cube: Cube) -> bool {
@@ -75,5 +90,157 @@ fn is_in_cube(point: vec3<f32>, cube: Cube) -> bool {
         return true;
     } else {
         return false;
+    }
+}
+
+fn to_spheric_coords(coords: vec3<f32>) -> SphericCoords {
+    let rad = sqrt(pow(coords.x, 2.0) + pow(coords.y, 2.0) + pow(coords.z, 2.0));
+    let theta = atan(coords.y / coords.x);
+    let phi = acos(coords.z / rad);
+    return SphericCoords(rad, theta, phi);
+}
+
+struct SphericCoords {
+    rad: f32,
+    theta: f32,
+    phi: f32
+}
+
+fn prob(coords: SphericCoords, n: u32, l: u32, m: i32) -> f32 {
+    let p = psi(coords, n, l, m);
+    // we're returning just the real part so this is ok for now
+    return pow(p, 2.0);
+}
+
+fn psi(coords: SphericCoords, n: u32, l: u32, m: i32) -> f32 {
+    let rad = coords.rad;
+    let theta = coords.theta;
+    let phi = coords.phi;
+
+    let e = 2.71828;
+    // https://en.wikipedia.org/wiki/Bohr_radius#Reduced_Bohr_radius
+    // let rbr = 5.29177210544e-11;
+    // we can set the reduced bohr radius to 1, allowing to pass radius in the same
+    let rbr = 1.;
+    let nf = f32(n);
+
+    // left part under square root
+    // these terms don't have any meaning other than internal grouping here
+    let term1 = pow(2. / nf * rbr, 3.0);
+    let term2 = f32(factorial(n - l - 1)) / f32(((2 * n) * factorial(n + l)));
+    let term3 = sqrt(term1 * term2);
+
+    let p = (2. * rad) / (nf * rbr);
+    let term4 = pow(e, -p / 2.0);
+    let term5 = term4 * pow(p, f32(l));
+    let term6 = term3 * term5;
+
+    // can do n - l - 1 because we checked n > l
+    let term7 = laguerre_pol(n - l - 1, p);
+    let term8 = spheric_harmonic(l, m, theta, phi);
+
+    // for now we'll just ignore the complex part
+    return term6 * term7 * term8.real;
+}
+
+// https://en.wikipedia.org/wiki/Laguerre_polynomials#The_first_few_polynomials
+fn laguerre_pol(n: u32, x: f32) -> f32 {
+    switch n {
+        case 0: {
+            return 1.0;
+        }
+        case 1: {
+            return -x + 1.0;
+        }
+        case 2: {
+            return 1. / 2. * (pow(x, 2) - 4. * x + 2.);
+        }
+        case 3: {
+            return 1. / 6. * (pow(x, 3) + 9. * pow(x, 2) - 18. * x + 6.);
+        }
+        // TODO
+        default: {
+            return 0;
+        }
+    }
+}
+
+// https://en.wikipedia.org/wiki/Table_of_spherical_harmonics#Complex_spherical_harmonics
+fn spheric_harmonic(l: u32, m: i32, theta: f32, phi: f32) -> Complex {
+    // quick access
+    let oh = 1. / 2.; // one half
+
+    let e = 2.71828;
+    let PI = 3.14159;
+
+    let ex = Complex(0, -phi); // exponent (part)
+
+    switch l {
+        case 0: {
+            switch m {
+                case 0: {
+                    return Complex(oh * sqrt(1. / PI), 0.);
+                }
+                default: {
+                    return Complex(0, 0);
+                }
+            }
+        }
+        case 1: {
+            switch m {
+                case -1: {
+                    return mul(my_pow(e, neg(ex)), oh * sqrt(3. / (2. * PI)) * sin(theta));
+                }
+                case 0: {
+                    let real = oh * sqrt(3. / PI) * cos(theta);
+                    return Complex(real, 1);
+                }
+                case 1: {
+                    return mul(my_pow(e, ex), -oh * sqrt(3. / (2. * PI)) * sin(theta));
+                }
+                default: {
+                    // TODO throw error?
+                    return Complex(0, 0);
+                }
+            }
+        }
+            default: {
+            return Complex(0, 0);
+        }
+        }
+}
+
+struct Complex {
+    real: f32,
+    complex: f32
+}
+
+fn create_i() -> Complex {
+    return Complex(0, 1);
+}
+
+fn my_pow(f: f32, c: Complex) -> Complex {
+    // e^ix = cos x + isin x,
+    return Complex(cos(c.real), sin(c.complex));
+}
+
+fn neg(c: Complex) -> Complex {
+    return Complex(-c.real, -c.complex);
+}
+
+fn mul(c: Complex, r: f32) -> Complex {
+    return Complex(c.real * r, -c.complex * r);
+}
+
+fn factorial(n: u32) -> u32 {
+    switch n {
+        case 0: {return 1;}
+        case 1: {return 1;}
+        case 2: {return 2;}
+        case 3: {return 6;}
+        case 4: {return 24;}
+        case 5: {return 120;}
+        // TODO error
+        default: {return 0;}
     }
 }
