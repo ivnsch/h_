@@ -1,1 +1,7 @@
-Based on https://github.com/amengede/webgpu-for-beginners/tree/main
+# h
+
+![img](./img/screen.png)
+
+```
+npm run dev
+```
