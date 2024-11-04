@@ -33,11 +33,6 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
 
     let is_in_cube_point = myRay.direction + vec3<f32>(offset_x, offset_y, 0.0);
     let scaled_point = is_in_cube_point * 0.01;
-    // let is_in_cube_point = myRay.direction + vec3<f32>(f32(horizontal_coefficient), f32(vertical_coefficient), 0.0);
-    if is_in_create_cube(scaled_point) {
-        let cyan = vec3<f32>(0.0, 1.0, 1.0);
-        pixel_color = cyan;
-    }
 
     let n: u32 = 1;
     let l: u32 = 0;
@@ -57,40 +52,8 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     textureStore(color_buffer, screen_pos, vec4<f32>(pixel_color, 1.0));
 }
 
-struct Cube {
-    min_x: f32,
-    max_x: f32,
-    min_y: f32,
-    max_y: f32,
-    min_z: f32,
-    max_z: f32,
-}
 
-fn is_in_create_cube(point: vec3<f32>) -> bool {
-    let len = 10.0;
-    let pos_z = 0.0;
 
-    let half = len / 2.0;
-    let min = -half;
-    let max = half;
-
-    var cube: Cube;
-    cube.min_x = min;
-    cube.max_x = max;
-    cube.min_y = min;
-    cube.max_y = max;
-    cube.min_z = min + pos_z;
-    cube.max_z = max + pos_z;
-
-    return is_in_cube(point, cube);
-}
-
-fn is_in_cube(point: vec3<f32>, cube: Cube) -> bool {
-    if point.x >= cube.min_x && point.y >= cube.min_y && point.z >= cube.min_z && point.x <= cube.max_x && point.y <= cube.max_y && point.z <= cube.max_z {
-        return true;
-    } else {
-        return false;
-    }
 }
 
 fn to_spheric_coords(coords: vec3<f32>) -> SphericCoords {
