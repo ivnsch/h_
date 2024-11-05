@@ -123,10 +123,7 @@ fn spheric_harmonic(l: u32, m: i32, theta: f32, phi: f32) -> Complex {
     // quick access
     let oh = 1. / 2.; // one half
 
-    let e = 2.71828;
     let PI = 3.14159;
-
-    let ex = Complex(0, -phi); // exponent (part)
 
     switch l {
         case 0: {
@@ -142,14 +139,14 @@ fn spheric_harmonic(l: u32, m: i32, theta: f32, phi: f32) -> Complex {
         case 1: {
             switch m {
                 case -1: {
-                    return mul(my_pow(e, neg(ex)), oh * sqrt(3. / (2. * PI)) * sin(theta));
+                    return mul(e_to_i_pow(-phi), oh * sqrt(3. / (2. * PI)) * sin(theta));
                 }
                 case 0: {
                     let real = oh * sqrt(3. / PI) * cos(theta);
                     return Complex(real, 1);
                 }
                 case 1: {
-                    return mul(my_pow(e, ex), -oh * sqrt(3. / (2. * PI)) * sin(theta));
+                    return mul(e_to_i_pow(phi), -oh * sqrt(3. / (2. * PI)) * sin(theta));
                 }
                 default: {
                     // TODO throw error?
@@ -172,9 +169,9 @@ fn create_i() -> Complex {
     return Complex(0, 1);
 }
 
-fn my_pow(f: f32, c: Complex) -> Complex {
-    // e^ix = cos x + isin x,
-    return Complex(cos(c.real), sin(c.complex));
+fn e_to_i_pow(i_multiplier: f32) -> Complex {
+    // e^ix = cos x + isin x, where x = i_multiplier
+    return Complex(cos(i_multiplier), sin(i_multiplier));
 }
 
 fn neg(c: Complex) -> Complex {
