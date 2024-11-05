@@ -40,8 +40,8 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     let spheric_coords = to_spheric_coords(scaled_point);
     let my_prob = prob(spheric_coords, n, l, m);
 
-    let wave_color = vec4<f32>(0.5, 0.5, 1.0, my_prob);
-    pixel_color = mix(background, wave_color, wave_color.a);
+    let prob_color = vec4<f32>(0.5, 0.5, 1.0, my_prob);
+    pixel_color = mix(background, prob_color, prob_color.a);
 
     textureStore(color_buffer, screen_pos, pixel_color);
 }
