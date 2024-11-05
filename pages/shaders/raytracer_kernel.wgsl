@@ -111,8 +111,8 @@ fn laguerre_pol(n: u32, x: f32) -> f32 {
         case 3: {
             return 1. / 6. * (pow(x, 3) + 9. * pow(x, 2) - 18. * x + 6.);
         }
-        // TODO
         default: {
+            // error
             return 0;
         }
     }
@@ -132,6 +132,7 @@ fn spheric_harmonic(l: u32, m: i32, theta: f32, phi: f32) -> Complex {
                     return Complex(oh * sqrt(1. / PI), 0.);
                 }
                 default: {
+                    // error
                     return Complex(0, 0);
                 }
             }
@@ -149,12 +150,13 @@ fn spheric_harmonic(l: u32, m: i32, theta: f32, phi: f32) -> Complex {
                     return mul(e_to_i_pow(phi), -oh * sqrt(3. / (2. * PI)) * sin(theta));
                 }
                 default: {
-                    // TODO throw error?
+                    // error
                     return Complex(0, 0);
                 }
             }
         }
             default: {
+            // error
             return Complex(0, 0);
         }
         }
