@@ -1,3 +1,5 @@
+import { vec3 } from "gl-matrix";
+import { Camera } from "./camera";
 import raytracer_kernel from "./shaders/raytracer_kernel.wgsl";
 import screen_shader from "./shaders/screen_shader.wgsl";
 
@@ -20,19 +22,22 @@ export class Renderer {
   ray_tracing_bind_group: GPUBindGroup;
   screen_pipeline: GPURenderPipeline;
   screen_bind_group: GPUBindGroup;
+  uniformBuffer: GPUBuffer;
+
+  movement: vec3;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
   }
 
   async Initialize() {
+    this.movement = vec3.create();
+
     await this.setupDevice();
 
     await this.createAssets();
 
     await this.makePipeline();
-
-    this.render();
   }
 
   async setupDevice() {
@@ -54,6 +59,11 @@ export class Renderer {
   }
 
   async makePipeline() {
+    this.uniformBuffer = this.device.createBuffer({
+      size: 4 * 4,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
+
     const ray_tracing_bind_group_layout = this.device.createBindGroupLayout({
       entries: [
         {
@@ -65,6 +75,11 @@ export class Renderer {
             viewDimension: "2d",
           },
         },
+        {
+          binding: 1,
+          visibility: GPUShaderStage.COMPUTE,
+          buffer: {},
+        },
       ],
     });
 
@@ -74,6 +89,12 @@ export class Renderer {
         {
           binding: 0,
           resource: this.color_buffer_view,
+        },
+        {
+          binding: 1,
+          resource: {
+            buffer: this.uniformBuffer,
+          },
         },
       ],
     });
@@ -180,7 +201,17 @@ export class Renderer {
     this.sampler = this.device.createSampler(samplerDescriptor);
   }
 
-  render = () => {
+  render = (movement: vec3) => {
+    this.movement[0] += movement[0];
+    this.movement[1] += movement[1];
+    this.movement[2] += movement[2];
+
+    this.device.queue.writeBuffer(
+      this.uniformBuffer,
+      0,
+      <ArrayBuffer>this.movement
+    );
+
     const commandEncoder: GPUCommandEncoder =
       this.device.createCommandEncoder();
 
@@ -216,7 +247,5 @@ export class Renderer {
     renderpass.end();
 
     this.device.queue.submit([commandEncoder.finish()]);
-
-    requestAnimationFrame(this.render);
   };
 }

@@ -1,8 +1,13 @@
 @group(0) @binding(0) var color_buffer: texture_storage_2d<rgba8unorm, write>;
+@group(0) @binding(1) var<uniform> movement: Movement;
 
 struct Ray {
     direction: vec3<f32>,
     origin: vec3<f32>,
+}
+
+struct Movement {
+    view: vec3<f32>,
 }
 
 @compute @workgroup_size(8,8,1)
@@ -31,13 +36,18 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     let background = vec4<f32>(0.0, 0.0, 0.0, 1.0);
     var pixel_color: vec4<f32> = background;
 
-    let is_in_cube_point = myRay.direction + vec3<f32>(offset_x, offset_y, 0.0);
-    let scaled_point = is_in_cube_point * 0.01;
+    let direction_with_offset = myRay.direction + vec3<f32>(offset_x, offset_y, 0.0);
+    let scaled_point = direction_with_offset * 0.01;
+    var transformed_point = scaled_point;
+
+    transformed_point.x += movement.view.x;
+    transformed_point.y += movement.view.y;
+    transformed_point.z += movement.view.z;
 
     let n: u32 = 1;
     let l: u32 = 0;
     let m = 0;
-    let spheric_coords = to_spheric_coords(scaled_point);
+    let spheric_coords = to_spheric_coords(transformed_point);
     let my_prob = prob(spheric_coords, n, l, m);
 
     let prob_color = vec4<f32>(0.5, 0.5, 1.0, my_prob);
