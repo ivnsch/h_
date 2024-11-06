@@ -61,6 +61,8 @@ export default function Home() {
           <h2 id="mouse-y-label"></h2>
           <div style={{ "margin-bottom": 70 }}>
             <Dropdown>
+          <div style={{ "margin-bottom": 70, "margin-top": 20 }}>
+            <Dropdown style={{ "margin-left": 5 }}>
               <DropdownTrigger>
                 <button variant="bordered">n</button>
               </DropdownTrigger>
