@@ -1,6 +1,12 @@
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@nextui-org/dropdown";
 import Head from "next/head";
-import styles from "../styles/Home.module.css";
 import { useEffect, useRef, useState } from "react";
+import styles from "../styles/Home.module.css";
 import { App } from "./app";
 
 export default function Home() {
@@ -11,6 +17,10 @@ export default function Home() {
   const [mouseXLabel, setMouseXLabel] = useState("");
   const [mouseYLabel, setMouseYLabel] = useState("");
 
+  const n = useRef("1");
+  const l = useRef("0");
+  const m = useRef("0");
+
   useEffect(() => {
     const nested = async () => {
       const app = new App(
@@ -18,13 +28,16 @@ export default function Home() {
         setKeyText,
         setMouseXLabel,
         setMouseYLabel,
+        () => n.current,
+        () => l.current,
+        () => m.current,
         document
       );
       await app.Initialize();
       app.run();
     };
     nested();
-  }, []);
+  }, [n, l, m]);
 
   return (
     <div className={styles.container}>
@@ -46,6 +59,44 @@ export default function Home() {
           <h2 id="mouse-x-label"></h2>
           <h2>Mouse Y: {mouseYLabel}</h2>
           <h2 id="mouse-y-label"></h2>
+          <Dropdown>
+            <DropdownTrigger>
+              <button variant="bordered">n</button>
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label="Static Actions"
+              onAction={(key) => {
+                n.current = key;
+                console.log("did set n to key: " + key);
+              }}
+            >
+              <DropdownItem key="1">1</DropdownItem>
+              <DropdownItem key="2">2</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+          <Dropdown>
+            <DropdownTrigger>
+              <button variant="bordered">l</button>
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label="Static Actions"
+              onAction={(key) => (l.current = key)}
+            >
+              <DropdownItem key="0">0</DropdownItem>
+              <DropdownItem key="1">1</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+          <Dropdown>
+            <DropdownTrigger>
+              <button variant="bordered">m</button>
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label="Static Actions"
+              onAction={(key) => (m.current = key)}
+            >
+              <DropdownItem key="0">0</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
           <canvas width="800" height="600" ref={canvasRef}></canvas>
         </div>
       </main>

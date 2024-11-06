@@ -6,6 +6,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@nextui-org/dropdown": "^2.1.31",
     "@webgpu/types": "^0.1.49",
     "gl-matrix": "^3.4.3",
     "next": "latest",

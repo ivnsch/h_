@@ -1,6 +1,7 @@
 @group(0) @binding(0) var color_buffer: texture_storage_2d<rgba8unorm, write>;
 @group(0) @binding(1) var<uniform> movement: Movement;
 @group(0) @binding(2) var<uniform> rotation: Rotation;
+@group(0) @binding(3) var<uniform> pars: Pars;
 
 struct Ray {
     direction: vec3<f32>,
@@ -12,6 +13,9 @@ struct Movement {
 }
 struct Rotation {
     rot: mat4x4<f32>,
+}
+struct Pars {
+    pars: vec3<f32>,
 }
 
 @compute @workgroup_size(8,8,1)
@@ -52,11 +56,8 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
 
     transformed_point = vec3<f32>(rotated.x, rotated.y, rotated.z);
 
-    let n: u32 = 2;
-    let l: u32 = 1;
-    let m = 0;
     let spheric_coords = to_spheric_coords(transformed_point);
-    let my_prob = prob(spheric_coords, n, l, m);
+    let my_prob = prob(spheric_coords, u32(pars.pars[0]), u32(pars.pars[1]), i32(pars.pars[2]));
 
     let brightener = 500.0;
     let prob_color = vec4<f32>(0.5, 0.5, 1.0, my_prob * brightener);

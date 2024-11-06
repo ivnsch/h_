@@ -17,12 +17,18 @@ export class App {
   rotXAmount: number;
   rotYAmount: number;
   rotZAmount: number;
+  n: () => string;
+  l: () => string;
+  m: () => string;
 
   constructor(
     canvas: HTMLCanvasElement,
     setKeyText: (value: string) => void,
     setMouseXLabel: (value: string) => void,
     setMouseYLabel: (value: string) => void,
+    n: () => string,
+    l: () => string,
+    m: () => string,
     document: Document
   ) {
     this.canvas = canvas;
@@ -38,6 +44,10 @@ export class App {
     this.rotXAmount = 0;
     this.rotYAmount = 0;
     this.rotZAmount = 0;
+
+    this.n = n;
+    this.l = l;
+    this.m = m;
 
     document.addEventListener("keydown", (e) => {
       this.handle_keypress(e);
@@ -62,7 +72,15 @@ export class App {
     var running: boolean = true;
 
     let v = vec3.fromValues(this.right_amount, 0, this.forwards_amount);
-    this.renderer.render(v, this.rotXAmount, this.rotYAmount, this.rotZAmount);
+    this.renderer.render(
+      v,
+      this.rotXAmount,
+      this.rotYAmount,
+      this.rotZAmount,
+      parseFloat(this.n()),
+      parseFloat(this.l()),
+      parseFloat(this.m())
+    );
 
     if (running) {
       requestAnimationFrame(this.run);

@@ -23,11 +23,13 @@ export class Renderer {
   screen_bind_group: GPUBindGroup;
   uniformBuffer: GPUBuffer;
   rotBuffer: GPUBuffer;
+  parsBuffer: GPUBuffer;
 
   movement: vec3;
   rotX: number;
   rotY: number;
   rotZ: number;
+  pars: vec3;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -38,6 +40,7 @@ export class Renderer {
     this.rotX = 0;
     this.rotY = 0;
     this.rotZ = 0;
+    this.pars = vec3.create();
 
     await this.setupDevice();
 
@@ -73,6 +76,10 @@ export class Renderer {
       size: 4 * 4 * 4,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
+    this.parsBuffer = this.device.createBuffer({
+      size: 4 * 4,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
 
     const ray_tracing_bind_group_layout = this.device.createBindGroupLayout({
       entries: [
@@ -92,6 +99,11 @@ export class Renderer {
         },
         {
           binding: 2,
+          visibility: GPUShaderStage.COMPUTE,
+          buffer: {},
+        },
+        {
+          binding: 3,
           visibility: GPUShaderStage.COMPUTE,
           buffer: {},
         },
@@ -115,6 +127,12 @@ export class Renderer {
           binding: 2,
           resource: {
             buffer: this.rotBuffer,
+          },
+        },
+        {
+          binding: 3,
+          resource: {
+            buffer: this.parsBuffer,
           },
         },
       ],
@@ -222,7 +240,15 @@ export class Renderer {
     this.sampler = this.device.createSampler(samplerDescriptor);
   }
 
-  render = (movement: vec3, rotX: number, rotY: number, rotZ: number) => {
+  render = (
+    movement: vec3,
+    rotX: number,
+    rotY: number,
+    rotZ: number,
+    n: number,
+    l: number,
+    m: number
+  ) => {
     this.movement[0] += movement[0];
     this.movement[1] += movement[1];
     this.movement[2] += movement[2];
@@ -241,6 +267,17 @@ export class Renderer {
     mat4.rotateY(rotMatrix, rotMatrix, this.rotY);
     mat4.rotateZ(rotMatrix, rotMatrix, this.rotZ);
     this.device.queue.writeBuffer(this.rotBuffer, 0, <ArrayBuffer>rotMatrix);
+
+    this.device.queue.writeBuffer(
+      this.uniformBuffer,
+      0,
+      <ArrayBuffer>this.movement
+    );
+
+    this.pars[0] = n;
+    this.pars[1] = l;
+    this.pars[2] = m;
+    this.device.queue.writeBuffer(this.parsBuffer, 0, <ArrayBuffer>this.pars);
 
     const commandEncoder: GPUCommandEncoder =
       this.device.createCommandEncoder();
