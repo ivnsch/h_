@@ -59,44 +59,46 @@ export default function Home() {
           <h2 id="mouse-x-label"></h2>
           <h2>Mouse Y: {mouseYLabel}</h2>
           <h2 id="mouse-y-label"></h2>
-          <Dropdown>
-            <DropdownTrigger>
-              <button variant="bordered">n</button>
-            </DropdownTrigger>
-            <DropdownMenu
-              aria-label="Static Actions"
-              onAction={(key) => {
-                n.current = key;
-                console.log("did set n to key: " + key);
-              }}
-            >
-              <DropdownItem key="1">1</DropdownItem>
-              <DropdownItem key="2">2</DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-          <Dropdown>
-            <DropdownTrigger>
-              <button variant="bordered">l</button>
-            </DropdownTrigger>
-            <DropdownMenu
-              aria-label="Static Actions"
-              onAction={(key) => (l.current = key)}
-            >
-              <DropdownItem key="0">0</DropdownItem>
-              <DropdownItem key="1">1</DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-          <Dropdown>
-            <DropdownTrigger>
-              <button variant="bordered">m</button>
-            </DropdownTrigger>
-            <DropdownMenu
-              aria-label="Static Actions"
-              onAction={(key) => (m.current = key)}
-            >
-              <DropdownItem key="0">0</DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
+          <div style={{ "margin-bottom": 70 }}>
+            <Dropdown>
+              <DropdownTrigger>
+                <button variant="bordered">n</button>
+              </DropdownTrigger>
+              <DropdownMenu
+                aria-label="Static Actions"
+                onAction={(key) => {
+                  n.current = key;
+                  console.log("did set n to key: " + key);
+                }}
+              >
+                <DropdownItem key="1">1</DropdownItem>
+                <DropdownItem key="2">2</DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+            <Dropdown>
+              <DropdownTrigger>
+                <button variant="bordered">l</button>
+              </DropdownTrigger>
+              <DropdownMenu
+                aria-label="Static Actions"
+                onAction={(key) => (l.current = key)}
+              >
+                <DropdownItem key="0">0</DropdownItem>
+                <DropdownItem key="1">1</DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+            <Dropdown>
+              <DropdownTrigger>
+                <button variant="bordered">m</button>
+              </DropdownTrigger>
+              <DropdownMenu
+                aria-label="Static Actions"
+                onAction={(key) => (m.current = key)}
+              >
+                <DropdownItem key="0">0</DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          </div>
           <canvas width="800" height="600" ref={canvasRef}></canvas>
         </div>
       </main>
