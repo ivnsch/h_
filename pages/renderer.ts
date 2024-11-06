@@ -1,5 +1,4 @@
-import { vec3 } from "gl-matrix";
-import { Camera } from "./camera";
+import { mat4, vec3 } from "gl-matrix";
 import raytracer_kernel from "./shaders/raytracer_kernel.wgsl";
 import screen_shader from "./shaders/screen_shader.wgsl";
 
@@ -23,8 +22,12 @@ export class Renderer {
   screen_pipeline: GPURenderPipeline;
   screen_bind_group: GPUBindGroup;
   uniformBuffer: GPUBuffer;
+  rotBuffer: GPUBuffer;
 
   movement: vec3;
+  rotX: number;
+  rotY: number;
+  rotZ: number;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -32,6 +35,9 @@ export class Renderer {
 
   async Initialize() {
     this.movement = vec3.create();
+    this.rotX = 0;
+    this.rotY = 0;
+    this.rotZ = 0;
 
     await this.setupDevice();
 
@@ -63,6 +69,10 @@ export class Renderer {
       size: 4 * 4,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
+    this.rotBuffer = this.device.createBuffer({
+      size: 4 * 4 * 4,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
 
     const ray_tracing_bind_group_layout = this.device.createBindGroupLayout({
       entries: [
@@ -80,6 +90,11 @@ export class Renderer {
           visibility: GPUShaderStage.COMPUTE,
           buffer: {},
         },
+        {
+          binding: 2,
+          visibility: GPUShaderStage.COMPUTE,
+          buffer: {},
+        },
       ],
     });
 
@@ -94,6 +109,12 @@ export class Renderer {
           binding: 1,
           resource: {
             buffer: this.uniformBuffer,
+          },
+        },
+        {
+          binding: 2,
+          resource: {
+            buffer: this.rotBuffer,
           },
         },
       ],
@@ -201,16 +222,25 @@ export class Renderer {
     this.sampler = this.device.createSampler(samplerDescriptor);
   }
 
-  render = (movement: vec3) => {
+  render = (movement: vec3, rotX: number, rotY: number, rotZ: number) => {
     this.movement[0] += movement[0];
     this.movement[1] += movement[1];
     this.movement[2] += movement[2];
+    this.rotX += rotX;
+    this.rotY += rotY;
+    this.rotZ += rotZ;
 
     this.device.queue.writeBuffer(
       this.uniformBuffer,
       0,
       <ArrayBuffer>this.movement
     );
+
+    const rotMatrix = mat4.create();
+    mat4.rotateX(rotMatrix, rotMatrix, this.rotX);
+    mat4.rotateY(rotMatrix, rotMatrix, this.rotY);
+    mat4.rotateZ(rotMatrix, rotMatrix, this.rotZ);
+    this.device.queue.writeBuffer(this.rotBuffer, 0, <ArrayBuffer>rotMatrix);
 
     const commandEncoder: GPUCommandEncoder =
       this.device.createCommandEncoder();

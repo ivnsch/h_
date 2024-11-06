@@ -14,6 +14,9 @@ export class App {
 
   forwards_amount: number;
   right_amount: number;
+  rotXAmount: number;
+  rotYAmount: number;
+  rotZAmount: number;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -32,6 +35,9 @@ export class App {
 
     this.forwards_amount = 0;
     this.right_amount = 0;
+    this.rotXAmount = 0;
+    this.rotYAmount = 0;
+    this.rotZAmount = 0;
 
     document.addEventListener("keydown", (e) => {
       this.handle_keypress(e);
@@ -56,7 +62,7 @@ export class App {
     var running: boolean = true;
 
     let v = vec3.fromValues(this.right_amount, 0, this.forwards_amount);
-    this.renderer.render(v);
+    this.renderer.render(v, this.rotXAmount, this.rotYAmount, this.rotZAmount);
 
     if (running) {
       requestAnimationFrame(this.run);
@@ -78,6 +84,15 @@ export class App {
     if (event.code == "KeyD") {
       this.right_amount = 0.02;
     }
+    if (event.code == "KeyX") {
+      this.rotXAmount = 0.02;
+    }
+    if (event.code == "KeyY") {
+      this.rotYAmount = 0.02;
+    }
+    if (event.code == "KeyZ") {
+      this.rotZAmount = 0.02;
+    }
   }
 
   handle_keyrelease(event: any) {
@@ -94,6 +109,15 @@ export class App {
     }
     if (event.code == "KeyD") {
       this.right_amount = 0;
+    }
+    if (event.code == "KeyX") {
+      this.rotXAmount = 0;
+    }
+    if (event.code == "KeyY") {
+      this.rotYAmount = 0;
+    }
+    if (event.code == "KeyZ") {
+      this.rotZAmount = 0;
     }
   }
 

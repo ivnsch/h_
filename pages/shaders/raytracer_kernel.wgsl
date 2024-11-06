@@ -1,5 +1,6 @@
 @group(0) @binding(0) var color_buffer: texture_storage_2d<rgba8unorm, write>;
 @group(0) @binding(1) var<uniform> movement: Movement;
+@group(0) @binding(2) var<uniform> rotation: Rotation;
 
 struct Ray {
     direction: vec3<f32>,
@@ -8,6 +9,9 @@ struct Ray {
 
 struct Movement {
     view: vec3<f32>,
+}
+struct Rotation {
+    rot: mat4x4<f32>,
 }
 
 @compute @workgroup_size(8,8,1)
@@ -44,8 +48,12 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     transformed_point.y += movement.view.y;
     transformed_point.z += movement.view.z;
 
-    let n: u32 = 1;
-    let l: u32 = 0;
+    let rotated = rotation.rot * vec4<f32>(transformed_point, 1.0);
+
+    transformed_point = vec3<f32>(rotated.x, rotated.y, rotated.z);
+
+    let n: u32 = 2;
+    let l: u32 = 1;
     let m = 0;
     let spheric_coords = to_spheric_coords(transformed_point);
     let my_prob = prob(spheric_coords, n, l, m);
