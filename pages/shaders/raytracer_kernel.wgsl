@@ -61,6 +61,10 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     let prob_color = vec4<f32>(0.5, 0.5, 1.0, my_prob);
     pixel_color = mix(background, prob_color, prob_color.a);
 
+    // if my_prob > 0.001 {
+    //     pixel_color = vec4<f32>(1.0, 0.0, 0.0, 1.0);
+    // }
+
     textureStore(color_buffer, screen_pos, pixel_color);
 }
 
