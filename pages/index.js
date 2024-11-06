@@ -53,14 +53,10 @@ export default function Home() {
           ) : (
             <div>Gpu is not supported!</div>
           )} */}
-          <h2>Current Key: {keyText}</h2>
-          <h2 id="key-label"></h2>
-          <h2>Mouse X: {mouseXLabel}</h2>
-          <h2 id="mouse-x-label"></h2>
-          <h2>Mouse Y: {mouseYLabel}</h2>
-          <h2 id="mouse-y-label"></h2>
-          <div style={{ "margin-bottom": 70 }}>
-            <Dropdown>
+          <div>Keyboard:</div>
+          <div>Rotation: x, y, z</div>
+          <div>Move left, right: a, d</div>
+          <div>Zoom in, out: w, s</div>
           <div style={{ "margin-bottom": 70, "margin-top": 20 }}>
             <Dropdown style={{ "margin-left": 5 }}>
               <DropdownTrigger>
