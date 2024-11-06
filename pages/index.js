@@ -7,7 +7,7 @@ import {
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 import styles from "../styles/Home.module.css";
-import { App } from "./app";
+import { App } from "../lib/app";
 
 export default function Home() {
   const [gpuSupported, setGpuSupported] = useState(false);
