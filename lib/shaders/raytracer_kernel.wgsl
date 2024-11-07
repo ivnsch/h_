@@ -28,40 +28,47 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
         return;
     }
 
+    // screen coords -> [-0.5 .. 0.5]
     let offset_x = (f32(screen_pos.x) - f32(screen_size.x) / 2);
     let offset_y = (f32(screen_pos.y) - f32(screen_size.y) / 2);
     let horizontal_coefficient: f32 = offset_x / f32(screen_size.x);
     let vertical_coefficient: f32 = offset_y / f32(screen_size.x);
-    let forwards: vec3<f32> = vec3<f32>(1.0, 0.0, 0.0);
-    let right: vec3<f32> = vec3<f32>(0.0, -1.0, 0.0);
-    let up: vec3<f32> = vec3<f32>(0.0, 0.0, 1.0);
 
+    // 3d span
+    let forwards: vec3<f32> = vec3<f32>(0.0, 0.0, -1.0);
+    let right: vec3<f32> = vec3<f32>(1.0, 0.0, 0.0);
+    let up: vec3<f32> = vec3<f32>(0.0, 1.0, 0.0);
+
+    // vector goes from screen inwards (opposite to observer), by `forwards` length
     var myRay: Ray;
     let v = forwards + horizontal_coefficient * right + vertical_coefficient * up;
     myRay.direction = normalize(v);
-    myRay.origin = vec3<f32>(offset_x, offset_y, 0.0);
+    // vector starts at pixel
+    myRay.origin = horizontal_coefficient * right + vertical_coefficient * up;
 
     let background = vec4<f32>(0.0, 0.0, 0.0, 1.0);
     var pixel_color: vec4<f32> = background;
 
-    let ray_from_origin = myRay.direction + myRay.origin;
-    let scaled_point = ray_from_origin * 0.01;
-    var transformed_point = scaled_point;
+    // move
+    myRay.direction.z += movement.view.z;
+    myRay.direction.y += movement.view.y;
+    myRay.direction.x += movement.view.x;
 
-    transformed_point.x += movement.view.x;
-    transformed_point.y += movement.view.y;
-    transformed_point.z += movement.view.z;
+    // rotate
+    let rotated_4 = rotation.rot * vec4<f32>(myRay.direction, 1.0);
+    let rotated_3 = vec3<f32>(rotated_4.x, rotated_4.y, rotated_4.z);
 
-    let rotated = rotation.rot * vec4<f32>(transformed_point, 1.0);
+    let spheric_coords = to_spheric_coords(rotated_3);
 
-    transformed_point = vec3<f32>(rotated.x, rotated.y, rotated.z);
-
-    let spheric_coords = to_spheric_coords(transformed_point);
+    // calculate pdf
     let my_prob = prob(spheric_coords, u32(pars.pars[0]), u32(pars.pars[1]), i32(pars.pars[2]));
 
+    // map to pixel color
     let brightener = 500.0;
     let prob_color = vec4<f32>(0.5, 0.5, 1.0, my_prob * brightener);
     pixel_color = mix(background, prob_color, prob_color.a);
+
+    // pixel_color = background;
 
     // if my_prob > 0.001 {
     //     pixel_color = vec4<f32>(1.0, 0.0, 0.0, 1.0);
