@@ -39,13 +39,13 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     var myRay: Ray;
     let v = forwards + horizontal_coefficient * right + vertical_coefficient * up;
     myRay.direction = normalize(v);
-    myRay.origin = vec3<f32>(0.0, 0.0, 0.0);
+    myRay.origin = vec3<f32>(offset_x, offset_y, 0.0);
 
     let background = vec4<f32>(0.0, 0.0, 0.0, 1.0);
     var pixel_color: vec4<f32> = background;
 
-    let direction_with_offset = myRay.direction + vec3<f32>(offset_x, offset_y, 0.0);
-    let scaled_point = direction_with_offset * 0.01;
+    let ray_from_origin = myRay.direction + myRay.origin;
+    let scaled_point = ray_from_origin * 0.01;
     var transformed_point = scaled_point;
 
     transformed_point.x += movement.view.x;
