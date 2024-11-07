@@ -8,6 +8,7 @@ import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 import styles from "../styles/Home.module.css";
 import { App } from "../lib/app";
+import { useSearchParams } from "next/navigation";
 
 export default function Home() {
   const [gpuSupported, setGpuSupported] = useState(false);
@@ -17,9 +18,22 @@ export default function Home() {
   const [mouseXLabel, setMouseXLabel] = useState("");
   const [mouseYLabel, setMouseYLabel] = useState("");
 
-  const n = useRef("1");
-  const l = useRef("0");
-  const m = useRef("0");
+  const searchParams = useSearchParams();
+  const searchN = searchParams.get("n");
+  const searchL = searchParams.get("l");
+  const searchM = searchParams.get("m");
+
+  const n = useRef(searchN);
+  const l = useRef(searchL);
+  const m = useRef(searchM);
+  const [, update] = useState(false);
+
+  useEffect(() => {
+    n.current = searchN ?? "1";
+    l.current = searchL ?? "0";
+    m.current = searchM ?? "0";
+    update((prev) => !prev);
+  }, [searchParams]);
 
   useEffect(() => {
     const nested = async () => {
@@ -53,10 +67,21 @@ export default function Home() {
           ) : (
             <div>Gpu is not supported!</div>
           )} */}
+          <>Search: {searchN}</>
           <div>Keyboard:</div>
           <div>Rotation: x, y, z</div>
           <div>Move left, right: a, d</div>
           <div>Zoom in, out: w, s</div>
+          {update && (
+            <div style={{ "margin-top": 20 }}>
+              {"Selected: n: " +
+                n.current +
+                ", l: " +
+                l.current +
+                ", m: " +
+                m.current}
+            </div>
+          )}
           <div style={{ "margin-bottom": 70, "margin-top": 20 }}>
             <Dropdown style={{ "margin-left": 5 }}>
               <DropdownTrigger>
@@ -68,6 +93,7 @@ export default function Home() {
                   n.current = key;
                   console.log("did set n to key: " + key);
                 }}
+                defaultSelectedKeys={searchN}
               >
                 <DropdownItem key="1">1</DropdownItem>
                 <DropdownItem key="2">2</DropdownItem>
@@ -82,6 +108,7 @@ export default function Home() {
               <DropdownMenu
                 aria-label="Static Actions"
                 onAction={(key) => (l.current = key)}
+                defaultSelectedKeys={searchL}
               >
                 <DropdownItem key="0">0</DropdownItem>
                 <DropdownItem key="1">1</DropdownItem>
@@ -95,6 +122,7 @@ export default function Home() {
               <DropdownMenu
                 aria-label="Static Actions"
                 onAction={(key) => (m.current = key)}
+                defaultSelectedKeys={searchM}
               >
                 <DropdownItem key="-2">-2</DropdownItem>
                 <DropdownItem key="-1">-1</DropdownItem>
