@@ -71,6 +71,8 @@ export default function Home() {
               >
                 <DropdownItem key="1">1</DropdownItem>
                 <DropdownItem key="2">2</DropdownItem>
+                <DropdownItem key="3">3</DropdownItem>
+                <DropdownItem key="4">4</DropdownItem>
               </DropdownMenu>
             </Dropdown>
             <Dropdown>
@@ -83,6 +85,7 @@ export default function Home() {
               >
                 <DropdownItem key="0">0</DropdownItem>
                 <DropdownItem key="1">1</DropdownItem>
+                <DropdownItem key="2">2</DropdownItem>
               </DropdownMenu>
             </Dropdown>
             <Dropdown>
@@ -93,7 +96,11 @@ export default function Home() {
                 aria-label="Static Actions"
                 onAction={(key) => (m.current = key)}
               >
+                <DropdownItem key="-2">-2</DropdownItem>
+                <DropdownItem key="-1">-1</DropdownItem>
                 <DropdownItem key="0">0</DropdownItem>
+                <DropdownItem key="1">1</DropdownItem>
+                <DropdownItem key="2">2</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>

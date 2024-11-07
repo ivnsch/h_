@@ -135,6 +135,9 @@ fn laguerre_pol(n: u32, x: f32) -> f32 {
         case 3: {
             return 1. / 6. * (pow(x, 3) + 9. * pow(x, 2) - 18. * x + 6.);
         }
+        case 4: {
+            return 1. / 24. * (pow(x, 4.0) - 16. * pow(x, 3.0) + 72. * pow(x, 2.0) - 96. * x + 24.);
+        }
         default: {
             // error
             return 0;
@@ -147,44 +150,90 @@ fn spheric_harmonic(l: u32, m: i32, theta: f32, phi: f32) -> Complex {
     // quick access
     let oh = 1. / 2.; // one half
 
-    let PI = 3.14159;
+    let pi = 3.14159;
+
+    let ex = Complex(0., -phi); // exponent (part)
 
     switch l {
-        case 0: {
+        case 0 : {
             switch m {
-                case 0: {
-                    return Complex(oh * sqrt(1. / PI), 0.);
+                case 0 : {
+                    return Complex(oh * sqrt(1. / pi), 0.);
                 }
                 default: {
                     // error
-                    return Complex(0, 0);
+                    return Complex(0., 0.);
                 }
             }
         }
-        case 1: {
+        case 1 : {
             switch m {
-                case -1: {
-                    return mul(e_to_i_pow(-phi), oh * sqrt(3. / (2. * PI)) * sin(theta));
+                case -1 : {
+                    return mul(e_to_i_pow(neg(ex)), oh * sqrt(3. / (2. * pi)) * sin(theta));
                 }
-                case 0: {
-                    let real = oh * sqrt(3. / PI) * cos(theta);
-                    return Complex(real, 1);
+                case 0 : {
+                    let real = oh * sqrt(3. / pi) * cos(theta);
+                    return Complex(real, 1.);
                 }
-                case 1: {
-                    return mul(e_to_i_pow(phi), -oh * sqrt(3. / (2. * PI)) * sin(theta));
+                case 1 : {
+                    return mul(e_to_i_pow(ex), -oh * sqrt(3. / (2. * pi)) * sin(theta));
                 }
                 default: {
                     // error
-                    return Complex(0, 0);
+                    return Complex(0., 0.);
                 }
             }
         }
-            default: {
+        case 2 : {
+            switch m {
+                case -2 : {
+                    let ex = Complex(0., -2. * phi);
+                    return mul(
+                        e_to_i_pow(ex),
+                        1. / 4. * sqrt(15. / (2. * pi)) * pow(sin(theta), 2.),
+                    );
+                }
+
+                case -1 : {
+                    let ex = Complex(0., -phi);
+                    return mul(
+                        e_to_i_pow(ex),
+                        oh * sqrt(15. / (2. * pi)) * sin(theta) * cos(theta),
+                    );
+                }
+                case 0 : {
+                    return Complex(
+                        1. / 4. * sqrt(5. / pi) * (3. * pow(cos(theta), 2.) - 1.),
+                        0.,
+                    );
+                }
+                case 1 : {
+                    let ex = Complex(0., phi);
+                    return mul(
+                        e_to_i_pow(ex),
+                        -oh * sqrt(15. / (2. * pi)) * sin(theta) * cos(theta),
+                    );
+                }
+                case 2 : {
+                    let ex = Complex(0., 2. * phi);
+                    return mul(
+                        e_to_i_pow(ex),
+                        1. / 4. * sqrt(15. / (2. * pi)) * pow(sin(theta), 2.),
+                    );
+                }
+                default: {
+                    // error
+                    return Complex(0., 0.);
+                }
+            }
+        }
+        default: {
             // error
-            return Complex(0, 0);
+            return Complex(0., 0.);
         }
-        }
+    }
 }
+
 
 struct Complex {
     real: f32,
@@ -195,9 +244,9 @@ fn create_i() -> Complex {
     return Complex(0, 1);
 }
 
-fn e_to_i_pow(i_multiplier: f32) -> Complex {
+fn e_to_i_pow(c: Complex) -> Complex {
     // e^ix = cos x + isin x, where x = i_multiplier
-    return Complex(cos(i_multiplier), sin(i_multiplier));
+    return Complex(cos(c.real), sin(c.complex));
 }
 
 fn neg(c: Complex) -> Complex {
