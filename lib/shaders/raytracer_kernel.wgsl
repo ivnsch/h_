@@ -61,16 +61,15 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     let spheric_coords = to_spheric_coords(rotated_3);
 
     // calculate pdf
-    let my_prob = prob(spheric_coords, u32(pars.pars[0]), u32(pars.pars[1]), i32(pars.pars[2]));
+    let pd = pd(spheric_coords, u32(pars.pars[0]), u32(pars.pars[1]), i32(pars.pars[2]));
 
     // map to pixel color
     let brightener = 500.0;
-    let prob_color = vec4<f32>(0.5, 0.5, 1.0, my_prob * brightener);
-    pixel_color = mix(background, prob_color, prob_color.a);
+    let pd_color = vec4<f32>(0.5, 0.5, 1.0, pd * brightener);
+    pixel_color = mix(background, pd_color, pd_color.a);
 
     // pixel_color = background;
-
-    // if my_prob > 0.001 {
+    // if pd > 0.001 {
     //     pixel_color = vec4<f32>(1.0, 0.0, 0.0, 1.0);
     // }
 
@@ -90,7 +89,7 @@ struct SphericCoords {
     phi: f32
 }
 
-fn prob(coords: SphericCoords, n: u32, l: u32, m: i32) -> f32 {
+fn pd(coords: SphericCoords, n: u32, l: u32, m: i32) -> f32 {
     let p = psi(coords, n, l, m);
     // we're returning just the real part so this is ok for now
     return pow(p, 2.0);
