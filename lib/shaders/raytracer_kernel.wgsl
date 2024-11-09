@@ -91,11 +91,10 @@ struct SphericCoords {
 
 fn pd(coords: SphericCoords, n: u32, l: u32, m: i32) -> f32 {
     let p = psi(coords, n, l, m);
-    // we're returning just the real part so this is ok for now
-    return pow(p, 2.0);
+    return pow(abs(p), 2.0);
 }
 
-fn psi(coords: SphericCoords, n: u32, l: u32, m: i32) -> f32 {
+fn psi(coords: SphericCoords, n: u32, l: u32, m: i32) -> Complex {
     let rad = coords.rad;
     let theta = coords.theta;
     let phi = coords.phi;
@@ -122,8 +121,7 @@ fn psi(coords: SphericCoords, n: u32, l: u32, m: i32) -> f32 {
     let term7 = laguerre_pol(n - l - 1, p);
     let term8 = spheric_harmonic(l, m, theta, phi);
 
-    // for now we'll just ignore the complex part
-    return term6 * term7 * term8.real;
+    return mul(term8, term6 * term7);
 }
 
 // https://en.wikipedia.org/wiki/Laguerre_polynomials#The_first_few_polynomials
@@ -261,6 +259,10 @@ fn neg(c: Complex) -> Complex {
 
 fn mul(c: Complex, r: f32) -> Complex {
     return Complex(c.real * r, -c.complex * r);
+}
+
+fn abs(c: Complex) -> f32 {
+    return sqrt(pow(c.real, 2.) + pow(c.complex, 2.));
 }
 
 fn factorial(n: u32) -> u32 {
