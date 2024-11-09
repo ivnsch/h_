@@ -56,7 +56,10 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
 
     // rotate
     let rotated_4 = rotation.rot * vec4<f32>(myRay.direction, 1.0);
-    let rotated_3 = vec3<f32>(rotated_4.x, rotated_4.y, rotated_4.z);
+    var rotated_3 = vec3<f32>(rotated_4.x, rotated_4.y, rotated_4.z);
+    
+    // step back a little, to have a better view
+    rotated_3.z -= 2.; 
 
     let spheric_coords = to_spheric_coords(rotated_3);
 
