@@ -29,8 +29,8 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     }
 
     // screen coords -> [-0.5 .. 0.5]
-    let offset_x = (f32(screen_pos.x) - f32(screen_size.x) / 2);
-    let offset_y = (f32(screen_pos.y) - f32(screen_size.y) / 2);
+    let offset_x = (f32(screen_pos.x) - f32(screen_size.x) / 2.);
+    let offset_y = (f32(screen_pos.y) - f32(screen_size.y) / 2.);
     let horizontal_coefficient: f32 = offset_x / f32(screen_size.x);
     let vertical_coefficient: f32 = offset_y / f32(screen_size.x);
 
