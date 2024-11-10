@@ -35,7 +35,7 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     let vertical_coefficient: f32 = offset_y / f32(screen_size.x);
 
     // 3d span
-    let forwards: vec3<f32> = vec3<f32>(0.0, 0.0, -1.0);
+    let forwards: vec3<f32> = vec3<f32>(0.0, 0.0, 1.0);
     let right: vec3<f32> = vec3<f32>(1.0, 0.0, 0.0);
     let up: vec3<f32> = vec3<f32>(0.0, 1.0, 0.0);
 
@@ -60,13 +60,19 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     myRay.direction.y += mov.y;
     myRay.direction.x += mov.x;
 
-    // rotate
-    let rotated_4 = rotation.rot * vec4<f32>(myRay.direction, 1.0);
+    // // rotate
+    // let rotated_4 = rotation.rot * vec4<f32>(myRay.direction, 1.0);
+    // var rotated_3 = vec3<f32>(rotated_4.x, rotated_4.y, rotated_4.z);
+
+    // move wave so it's centered at origin, rotate and move back
+    let init_center_offset = vec3<f32>(0.0, 0.0, internal_scaling_factor);
+    let to_rotate = myRay.direction - mov - init_center_offset;
+    let rotated_4 = rotation.rot * vec4<f32>(to_rotate, 1.0);
     var rotated_3 = vec3<f32>(rotated_4.x, rotated_4.y, rotated_4.z);
-    
+    rotated_3 = rotated_3 + mov + init_center_offset;
+
     // step back a little, to have a better view
-    // rotated_3.z += 2.; 
-    rotated_3.z += 12.; 
+    rotated_3.z -= internal_scaling_factor; 
 
     // // collect evenly spaced values along ray
     // let array_length = 100;
