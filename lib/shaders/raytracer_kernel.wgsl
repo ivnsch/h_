@@ -49,17 +49,23 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     let background = vec4<f32>(0.0, 0.0, 0.0, 1.0);
     var pixel_color: vec4<f32> = background;
 
+    var mov = movement.view;
+
+    let internal_scaling_factor = 12.0;
+    myRay.direction *= internal_scaling_factor;
+    mov *= internal_scaling_factor /  4.0;
+
     // move
-    myRay.direction.z += movement.view.z;
-    myRay.direction.y += movement.view.y;
-    myRay.direction.x += movement.view.x;
+    myRay.direction.z += mov.z;
+    myRay.direction.y += mov.y;
+    myRay.direction.x += mov.x;
 
     // rotate
     let rotated_4 = rotation.rot * vec4<f32>(myRay.direction, 1.0);
     var rotated_3 = vec3<f32>(rotated_4.x, rotated_4.y, rotated_4.z);
     
     // step back a little, to have a better view
-    rotated_3.z -= 2.; 
+    rotated_3.z += 2.; 
 
     // collect evenly spaced values along ray
     let array_length = 100;
