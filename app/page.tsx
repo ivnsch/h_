@@ -7,7 +7,7 @@ import {
   DropdownTrigger,
 } from "@nextui-org/dropdown";
 import Head from "next/head";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { App } from "../lib/app";
 import { useSearchParams } from "next/navigation";
 
@@ -60,77 +60,85 @@ export default function Home() {
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <main>
-        <div id="compatibility-check">
-          {/* {gpuSupported ? (
+        <div>
+          {/* <div className="text-3xl font-bold underline">Hello world!</div> */}
+          <div id="compatibility-check" className="p-4">
+            {/* {gpuSupported ? (
               <div>Gpu is supported!</div>
             ) : (
               <div>Gpu is not supported!</div>
             )} */}
-          <div>Keyboard:</div>
-          <div>Rotation: x, y, z</div>
-          <div>Move left, right: a, d</div>
-          <div>Zoom in, out: w, s</div>
-          {update && (
-            <div style={{ "margin-top": 20 }}>
-              {"Selected: n: " +
-                n.current +
-                ", l: " +
-                l.current +
-                ", m: " +
-                m.current}
+            <div>Keyboard:</div>
+            <div>Rotation: x, y, z</div>
+            <div>Move left, right: a, d</div>
+            <div>Zoom in, out: w, s</div>
+            {update && (
+              <div>
+                {"Selected: n: " +
+                  n.current +
+                  ", l: " +
+                  l.current +
+                  ", m: " +
+                  m.current}
+              </div>
+            )}
+            <div className="my-2">
+              <Dropdown>
+                <DropdownTrigger>
+                  <button variant="bordered" className="mr-2 px-4">
+                    {"n:" + n.current}
+                  </button>
+                </DropdownTrigger>
+                <DropdownMenu
+                  aria-label="Static Actions"
+                  onAction={(key) => {
+                    n.current = key;
+                    console.log("did set n to key: " + key);
+                  }}
+                  defaultSelectedKeys={searchN}
+                >
+                  <DropdownItem key="1">1</DropdownItem>
+                  <DropdownItem key="2">2</DropdownItem>
+                  <DropdownItem key="3">3</DropdownItem>
+                  <DropdownItem key="4">4</DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+              <Dropdown>
+                <DropdownTrigger>
+                  <button variant="bordered" className="mr-2 px-4">
+                    {"l:" + l.current}
+                  </button>
+                </DropdownTrigger>
+                <DropdownMenu
+                  aria-label="Static Actions"
+                  onAction={(key) => (l.current = key)}
+                  defaultSelectedKeys={searchL}
+                >
+                  <DropdownItem key="0">0</DropdownItem>
+                  <DropdownItem key="1">1</DropdownItem>
+                  <DropdownItem key="2">2</DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+              <Dropdown>
+                <DropdownTrigger>
+                  <button variant="bordered" className="mr-2 px-4">
+                    {"m:" + m.current}
+                  </button>
+                </DropdownTrigger>
+                <DropdownMenu
+                  aria-label="Static Actions"
+                  onAction={(key) => (m.current = key)}
+                  defaultSelectedKeys={searchM}
+                >
+                  <DropdownItem key="-2">-2</DropdownItem>
+                  <DropdownItem key="-1">-1</DropdownItem>
+                  <DropdownItem key="0">0</DropdownItem>
+                  <DropdownItem key="1">1</DropdownItem>
+                  <DropdownItem key="2">2</DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
             </div>
-          )}
-          <div style={{ "margin-bottom": 70, "margin-top": 20 }}>
-            <Dropdown style={{ "margin-left": 5 }}>
-              <DropdownTrigger>
-                <button variant="bordered">n</button>
-              </DropdownTrigger>
-              <DropdownMenu
-                aria-label="Static Actions"
-                onAction={(key) => {
-                  n.current = key;
-                  console.log("did set n to key: " + key);
-                }}
-                defaultSelectedKeys={searchN}
-              >
-                <DropdownItem key="1">1</DropdownItem>
-                <DropdownItem key="2">2</DropdownItem>
-                <DropdownItem key="3">3</DropdownItem>
-                <DropdownItem key="4">4</DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-            <Dropdown>
-              <DropdownTrigger>
-                <button variant="bordered">l</button>
-              </DropdownTrigger>
-              <DropdownMenu
-                aria-label="Static Actions"
-                onAction={(key) => (l.current = key)}
-                defaultSelectedKeys={searchL}
-              >
-                <DropdownItem key="0">0</DropdownItem>
-                <DropdownItem key="1">1</DropdownItem>
-                <DropdownItem key="2">2</DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-            <Dropdown>
-              <DropdownTrigger>
-                <button variant="bordered">m</button>
-              </DropdownTrigger>
-              <DropdownMenu
-                aria-label="Static Actions"
-                onAction={(key) => (m.current = key)}
-                defaultSelectedKeys={searchM}
-              >
-                <DropdownItem key="-2">-2</DropdownItem>
-                <DropdownItem key="-1">-1</DropdownItem>
-                <DropdownItem key="0">0</DropdownItem>
-                <DropdownItem key="1">1</DropdownItem>
-                <DropdownItem key="2">2</DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
           </div>
           <canvas width="800" height="600" ref={canvasRef}></canvas>
         </div>
