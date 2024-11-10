@@ -2,42 +2,28 @@ import { vec3 } from "gl-matrix";
 import { Renderer } from "./renderer";
 
 export class App {
-  canvas: HTMLCanvasElement;
+  canvas: HTMLCanvasElement | null;
   renderer: Renderer;
-
-  keyLabel: HTMLElement;
-  mouseXLabel: HTMLElement;
-  mouseYLabel: HTMLElement;
-  setKeyText: (value: string) => void;
-  setMouseXLabel: (value: string) => void;
-  setMouseYLabel: (value: string) => void;
 
   forwards_amount: number;
   right_amount: number;
   rotXAmount: number;
   rotYAmount: number;
   rotZAmount: number;
-  n: () => string;
-  l: () => string;
-  m: () => string;
+  n: () => string | null;
+  l: () => string | null;
+  m: () => string | null;
 
   constructor(
-    canvas: HTMLCanvasElement,
-    setKeyText: (value: string) => void,
-    setMouseXLabel: (value: string) => void,
-    setMouseYLabel: (value: string) => void,
-    n: () => string,
-    l: () => string,
-    m: () => string,
+    canvas: HTMLCanvasElement | null,
+    n: () => string | null,
+    l: () => string | null,
+    m: () => string | null,
     document: Document
   ) {
     this.canvas = canvas;
 
     this.renderer = new Renderer(canvas);
-
-    this.setKeyText = setKeyText;
-    this.setMouseXLabel = setMouseXLabel;
-    this.setMouseYLabel = setMouseYLabel;
 
     this.forwards_amount = 0;
     this.right_amount = 0;
@@ -56,12 +42,11 @@ export class App {
       this.handle_keyrelease(e);
     });
 
-    this.canvas.onclick = () => {
-      this.canvas.requestPointerLock();
-    };
-    this.canvas.addEventListener("mousemove", (event: MouseEvent) => {
-      this.handle_mouse_move(event);
-    });
+    if (this.canvas) {
+      this.canvas.onclick = () => {
+        this.canvas?.requestPointerLock();
+      };
+    }
   }
 
   async Initialize() {
@@ -69,27 +54,21 @@ export class App {
   }
 
   run = () => {
-    var running: boolean = true;
-
-    let v = vec3.fromValues(this.right_amount, 0, this.forwards_amount);
+    const v = vec3.fromValues(this.right_amount, 0, this.forwards_amount);
     this.renderer.render(
       v,
       this.rotXAmount,
       this.rotYAmount,
       this.rotZAmount,
-      parseFloat(this.n()),
-      parseFloat(this.l()),
-      parseFloat(this.m())
+      parseFloat(this.n() ?? "1"),
+      parseFloat(this.l() ?? "0"),
+      parseFloat(this.m() ?? "0")
     );
 
-    if (running) {
-      requestAnimationFrame(this.run);
-    }
+    requestAnimationFrame(this.run);
   };
 
-  handle_keypress(event: any) {
-    this.setKeyText(event.code);
-
+  handle_keypress(event: KeyboardEvent) {
     if (event.code == "KeyW") {
       this.forwards_amount = 0.02;
     }
@@ -113,9 +92,7 @@ export class App {
     }
   }
 
-  handle_keyrelease(event: any) {
-    this.setKeyText(event.code);
-
+  handle_keyrelease(event: KeyboardEvent) {
     if (event.code == "KeyW") {
       this.forwards_amount = 0;
     }
@@ -137,11 +114,6 @@ export class App {
     if (event.code == "KeyZ") {
       this.rotZAmount = 0;
     }
-  }
-
-  handle_mouse_move(event: MouseEvent) {
-    this.setMouseXLabel(event.clientX.toString());
-    this.setMouseYLabel(event.clientY.toString());
   }
 
   clearTransforms = () => {
