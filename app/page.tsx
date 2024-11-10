@@ -54,6 +54,12 @@ export default function Home() {
     nested();
   }, [n, l, m]);
 
+  const updateUrl = (key: string, value: string) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set(key, value);
+    window.history.pushState({}, "", url.toString());
+  };
+
   return (
     <div>
       <Head>
@@ -94,7 +100,7 @@ export default function Home() {
                   aria-label="Static Actions"
                   onAction={(key) => {
                     n.current = key;
-                    console.log("did set n to key: " + key);
+                    updateUrl("n", key.toString());
                   }}
                   defaultSelectedKeys={searchN}
                 >
@@ -112,7 +118,10 @@ export default function Home() {
                 </DropdownTrigger>
                 <DropdownMenu
                   aria-label="Static Actions"
-                  onAction={(key) => (l.current = key)}
+                  onAction={(key) => {
+                    l.current = key;
+                    updateUrl("l", key.toString());
+                  }}
                   defaultSelectedKeys={searchL}
                 >
                   <DropdownItem key="0">0</DropdownItem>
@@ -128,7 +137,10 @@ export default function Home() {
                 </DropdownTrigger>
                 <DropdownMenu
                   aria-label="Static Actions"
-                  onAction={(key) => (m.current = key)}
+                  onAction={(key) => {
+                    m.current = key;
+                    updateUrl("m", key.toString());
+                  }}
                   defaultSelectedKeys={searchM}
                 >
                   <DropdownItem key="-2">-2</DropdownItem>
