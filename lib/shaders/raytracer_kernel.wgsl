@@ -61,14 +61,31 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     // step back a little, to have a better view
     rotated_3.z -= 2.; 
 
-    let spheric_coords = to_spheric_coords(rotated_3);
+    // collect evenly spaced values along ray
+    let array_length = 100;
+    var pds = array<f32, 100>();
+    let start = rotated_3.z;
+    let segment_length = 0.1;
+    for (var i = 0; i < array_length; i += 1) {
+        // advance a step on z
+        let z_offset = f32(i) * segment_length;
+        rotated_3.z = start + z_offset;
+        // calculate pdf
+        let spheric_coords = to_spheric_coords(rotated_3);
+        let pd = pd(spheric_coords, u32(pars.pars[0]), u32(pars.pars[1]), i32(pars.pars[2]));
+        // multiply pdf by segment length and store
+        pds[i] = pd * segment_length;
+    }
 
-    // calculate pdf
-    let pd = pd(spheric_coords, u32(pars.pars[0]), u32(pars.pars[1]), i32(pars.pars[2]));
+    // sum all segments
+    var pd_sum: f32 = 0.0;
+    for (var i = 0; i < array_length; i += 1) {
+        pd_sum = pd_sum + pds[i];
+    }
 
     // map to pixel color
-    let brightener = 500.0;
-    let pd_color = vec4<f32>(0.5, 0.5, 1.0, pd * brightener);
+    let brightener = 100.0;
+    let pd_color = vec4<f32>(0.5, 0.5, 1.0, pd_sum * brightener);
     pixel_color = mix(background, pd_color, pd_color.a);
 
     // pixel_color = background;
