@@ -79,16 +79,6 @@ export default function Home() {
             <div>Rotation: x, y, z</div>
             <div>Move left, right: a, d</div>
             <div>Zoom in, out: w, s</div>
-            {update && (
-              <div>
-                {"Selected: n: " +
-                  n.current +
-                  ", l: " +
-                  l.current +
-                  ", m: " +
-                  m.current}
-              </div>
-            )}
             <div className="my-2">
               <Dropdown>
                 <DropdownTrigger>
