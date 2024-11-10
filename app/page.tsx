@@ -29,6 +29,8 @@ export default function Home() {
   const m = useRef(searchM);
   const [, update] = useState(false);
 
+  const appRef = useRef<App>(null);
+
   useEffect(() => {
     n.current = searchN ?? "1";
     l.current = searchL ?? "0";
@@ -48,6 +50,7 @@ export default function Home() {
         () => m.current,
         document
       );
+      appRef.current = app;
       await app.Initialize();
       app.run();
     };
@@ -91,6 +94,7 @@ export default function Home() {
                   onAction={(key) => {
                     n.current = key;
                     updateUrl("n", key.toString());
+                    appRef.current?.clearTransforms();
                   }}
                   defaultSelectedKeys={searchN}
                 >
@@ -111,6 +115,7 @@ export default function Home() {
                   onAction={(key) => {
                     l.current = key;
                     updateUrl("l", key.toString());
+                    appRef.current?.clearTransforms();
                   }}
                   defaultSelectedKeys={searchL}
                 >
@@ -130,6 +135,7 @@ export default function Home() {
                   onAction={(key) => {
                     m.current = key;
                     updateUrl("m", key.toString());
+                    appRef.current?.clearTransforms();
                   }}
                   defaultSelectedKeys={searchM}
                 >

@@ -240,6 +240,15 @@ export class Renderer {
     this.sampler = this.device.createSampler(samplerDescriptor);
   }
 
+  clearTransforms = () => {
+    this.movement[0] = 0;
+    this.movement[1] = 0;
+    this.movement[2] = 0;
+    this.rotX = 0;
+    this.rotY = 0;
+    this.rotZ = 0;
+  };
+
   render = (
     movement: vec3,
     rotX: number,

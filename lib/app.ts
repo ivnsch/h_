@@ -143,4 +143,8 @@ export class App {
     this.setMouseXLabel(event.clientX.toString());
     this.setMouseYLabel(event.clientY.toString());
   }
+
+  clearTransforms = () => {
+    this.renderer.clearTransforms();
+  };
 }
