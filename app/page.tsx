@@ -56,15 +56,15 @@ export default function Home() {
   };
 
   return (
-    <div>
+    <div className="h-full">
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
-        <div>
+      <main className="h-full">
+        <div className="h-full">
           {/* <div className="text-3xl font-bold underline">Hello world!</div> */}
-          <div id="compatibility-check" className="p-4">
+          <div id="compatibility-check" className="p-4 absolute bg-gray-900">
             {/* {gpuSupported ? (
               <div>Gpu is supported!</div>
             ) : (
@@ -158,7 +158,7 @@ export default function Home() {
               </Dropdown>
             </div>
           </div>
-          <canvas width="800" height="600" ref={canvasRef}></canvas>
+          <canvas className="w-full h-full" ref={canvasRef}></canvas>
         </div>
       </main>
     </div>
