@@ -53,7 +53,6 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
 
     let internal_scaling_factor = 12.0;
     myRay.direction *= internal_scaling_factor;
-    mov *= internal_scaling_factor /  4.0;
 
     // move
     myRay.direction.z += mov.z;
