@@ -1,7 +1,7 @@
 /// <reference types="@webgpu/types" />
 import { mat4, vec3 } from "gl-matrix";
-import raytracer_kernel from "./shaders/raytracer_kernel.wgsl";
-import screen_shader from "./shaders/screen_shader.wgsl";
+import compute from "./shaders/compute.wgsl";
+import vertex_frag from "./shaders/vertex_frag.wgsl";
 
 export class Renderer {
   canvas: HTMLCanvasElement | null;
@@ -167,7 +167,7 @@ export class Renderer {
 
         compute: {
           module: this.device.createShaderModule({
-            code: raytracer_kernel,
+            code: compute,
           }),
           entryPoint: "main",
         },
@@ -211,14 +211,14 @@ export class Renderer {
 
         vertex: {
           module: this.device.createShaderModule({
-            code: screen_shader,
+            code: vertex_frag,
           }),
           entryPoint: "vert_main",
         },
 
         fragment: {
           module: this.device.createShaderModule({
-            code: screen_shader,
+            code: vertex_frag,
           }),
           entryPoint: "frag_main",
           targets: [
