@@ -304,19 +304,28 @@ export class Renderer {
     l: number,
     m: number
   ) => {
-    const transformationMatrix = getTransformationMatrix(this.canvas);
-    this.device.queue.writeBuffer(
-      this.transformationBuffer,
-      0,
-      transformationMatrix
-    );
-
     this.movement[0] += movement[0];
     this.movement[1] += movement[1];
     this.movement[2] += movement[2];
     this.rotX += rotX;
     this.rotY += rotY;
     this.rotZ += rotZ;
+
+    const transformationMatrix = getTransformationMatrix(
+      this.canvas,
+      this.movement[0],
+      this.movement[1],
+      this.movement[2],
+      this.rotX,
+      this.rotY,
+      this.rotZ
+    );
+    this.device.queue.writeBuffer(
+      this.transformationBuffer,
+      0,
+      transformationMatrix
+    );
+
     console.log("!! mov.z is: %o", this.movement[2]);
 
     this.device.queue.writeBuffer(
