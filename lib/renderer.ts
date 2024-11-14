@@ -1,7 +1,10 @@
 /// <reference types="@webgpu/types" />
 import { mat4, vec3 } from "gl-matrix";
 import compute from "./shaders/compute.wgsl";
+import compute_debug from "./shaders/compute_debug.wgsl";
 import vertex_frag from "./shaders/vertex_frag.wgsl";
+import vertex_frag_debug from "./shaders/vertex_frag_debug.wgsl";
+import { getTransformationMatrix } from "./matrix";
 
 export class Renderer {
   canvas: HTMLCanvasElement | null;
@@ -25,6 +28,7 @@ export class Renderer {
   uniformBuffer: GPUBuffer | null;
   rotBuffer: GPUBuffer | null;
   parsBuffer: GPUBuffer | null;
+  transformationBuffer: GPUBuffer | null;
 
   movement: vec3 | null;
   rotX: number | null;
@@ -49,6 +53,7 @@ export class Renderer {
     this.rotBuffer = null;
     this.parsBuffer = null;
     this.movement = null;
+    this.transformationBuffer = null;
     this.rotX = null;
     this.rotY = null;
     this.rotZ = null;
@@ -98,6 +103,10 @@ export class Renderer {
       });
       this.parsBuffer = this.device.createBuffer({
         size: 4 * 4,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      });
+      this.transformationBuffer = this.device.createBuffer({
+        size: 4 * 4 * 4,
         usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
       });
 
@@ -167,7 +176,8 @@ export class Renderer {
 
         compute: {
           module: this.device.createShaderModule({
-            code: compute,
+            // code: compute,
+            code: compute_debug,
           }),
           entryPoint: "main",
         },
@@ -185,6 +195,11 @@ export class Renderer {
             visibility: GPUShaderStage.FRAGMENT,
             texture: {},
           },
+          {
+            binding: 2,
+            visibility: GPUShaderStage.VERTEX,
+            buffer: {},
+          },
         ],
       });
 
@@ -199,6 +214,12 @@ export class Renderer {
             binding: 1,
             resource: this.color_buffer_view,
           },
+          {
+            binding: 2,
+            resource: {
+              buffer: this.transformationBuffer,
+            },
+          },
         ],
       });
 
@@ -211,14 +232,16 @@ export class Renderer {
 
         vertex: {
           module: this.device.createShaderModule({
-            code: vertex_frag,
+            code: vertex_frag_debug,
+            // code: vertex_frag,
           }),
           entryPoint: "vert_main",
         },
 
         fragment: {
           module: this.device.createShaderModule({
-            code: vertex_frag,
+            code: vertex_frag_debug,
+            // code: vertex_frag,
           }),
           entryPoint: "frag_main",
           targets: [
@@ -281,12 +304,20 @@ export class Renderer {
     l: number,
     m: number
   ) => {
+    const transformationMatrix = getTransformationMatrix(this.canvas);
+    this.device.queue.writeBuffer(
+      this.transformationBuffer,
+      0,
+      transformationMatrix
+    );
+
     this.movement[0] += movement[0];
     this.movement[1] += movement[1];
     this.movement[2] += movement[2];
     this.rotX += rotX;
     this.rotY += rotY;
     this.rotZ += rotZ;
+    console.log("!! mov.z is: %o", this.movement[2]);
 
     this.device.queue.writeBuffer(
       this.uniformBuffer,
@@ -344,7 +375,8 @@ export class Renderer {
 
     renderpass.setPipeline(this.screen_pipeline);
     renderpass.setBindGroup(0, this.screen_bind_group);
-    renderpass.draw(6, 1, 0, 0);
+    // renderpass.draw(6, 1, 0, 0);
+    renderpass.draw(36, 1, 0, 0);
 
     renderpass.end();
 

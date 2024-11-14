@@ -19,7 +19,8 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "ts-loader": "^9.5.1",
-    "ts-shader-loader": "^2.0.2"
+    "ts-shader-loader": "^2.0.2",
+    "wgpu-matrix": "^3.3.0"
   },
   "devDependencies": {
     "@types/node": "^20",
