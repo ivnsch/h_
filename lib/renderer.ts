@@ -136,6 +136,11 @@ export class Renderer {
             visibility: GPUShaderStage.COMPUTE,
             buffer: {},
           },
+          {
+            binding: 4,
+            visibility: GPUShaderStage.COMPUTE,
+            buffer: {},
+          },
         ],
       });
 
@@ -162,6 +167,12 @@ export class Renderer {
             binding: 3,
             resource: {
               buffer: this.parsBuffer,
+            },
+          },
+          {
+            binding: 4,
+            resource: {
+              buffer: this.transformationBuffer,
             },
           },
         ],
@@ -232,16 +243,16 @@ export class Renderer {
 
         vertex: {
           module: this.device.createShaderModule({
-            code: vertex_frag_debug,
-            // code: vertex_frag,
+            // code: vertex_frag_debug,
+            code: vertex_frag,
           }),
           entryPoint: "vert_main",
         },
 
         fragment: {
           module: this.device.createShaderModule({
-            code: vertex_frag_debug,
-            // code: vertex_frag,
+            // code: vertex_frag_debug,
+            code: vertex_frag,
           }),
           entryPoint: "frag_main",
           targets: [
@@ -334,17 +345,17 @@ export class Renderer {
       <ArrayBuffer>this.movement
     );
 
-    const rotMatrix = mat4.create();
-    mat4.rotateX(rotMatrix, rotMatrix, this.rotX);
-    mat4.rotateY(rotMatrix, rotMatrix, this.rotY);
-    mat4.rotateZ(rotMatrix, rotMatrix, this.rotZ);
-    this.device.queue.writeBuffer(this.rotBuffer, 0, <ArrayBuffer>rotMatrix);
+    // const rotMatrix = mat4.create();
+    // mat4.rotateX(rotMatrix, rotMatrix, this.rotX);
+    // mat4.rotateY(rotMatrix, rotMatrix, this.rotY);
+    // mat4.rotateZ(rotMatrix, rotMatrix, this.rotZ);
+    // this.device.queue.writeBuffer(this.rotBuffer, 0, <ArrayBuffer>rotMatrix);
 
-    this.device.queue.writeBuffer(
-      this.uniformBuffer,
-      0,
-      <ArrayBuffer>this.movement
-    );
+    // this.device.queue.writeBuffer(
+    //   this.uniformBuffer,
+    //   0,
+    //   <ArrayBuffer>this.movement
+    // );
 
     this.pars[0] = n;
     this.pars[1] = l;
