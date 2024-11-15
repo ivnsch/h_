@@ -187,8 +187,8 @@ export class Renderer {
 
         compute: {
           module: this.device.createShaderModule({
-            // code: compute,
-            code: compute_debug,
+            code: compute,
+            // code: compute_debug,
           }),
           entryPoint: "main",
         },
@@ -322,20 +322,20 @@ export class Renderer {
     this.rotY += rotY;
     this.rotZ += rotZ;
 
-    const transformationMatrix = getTransformationMatrix(
-      this.canvas,
-      this.movement[0],
-      this.movement[1],
-      this.movement[2],
-      this.rotX,
-      this.rotY,
-      this.rotZ
-    );
-    this.device.queue.writeBuffer(
-      this.transformationBuffer,
-      0,
-      transformationMatrix
-    );
+    // const transformationMatrix = getTransformationMatrix(
+    //   this.canvas,
+    //   this.movement[0],
+    //   this.movement[1],
+    //   this.movement[2],
+    //   this.rotX,
+    //   this.rotY,
+    //   this.rotZ
+    // );
+    // this.device.queue.writeBuffer(
+    //   this.transformationBuffer,
+    //   0,
+    //   transformationMatrix
+    // );
 
     console.log("!! mov.z is: %o", this.movement[2]);
 
@@ -345,17 +345,17 @@ export class Renderer {
       <ArrayBuffer>this.movement
     );
 
-    // const rotMatrix = mat4.create();
-    // mat4.rotateX(rotMatrix, rotMatrix, this.rotX);
-    // mat4.rotateY(rotMatrix, rotMatrix, this.rotY);
-    // mat4.rotateZ(rotMatrix, rotMatrix, this.rotZ);
-    // this.device.queue.writeBuffer(this.rotBuffer, 0, <ArrayBuffer>rotMatrix);
+    const rotMatrix = mat4.create();
+    mat4.rotateX(rotMatrix, rotMatrix, this.rotX);
+    mat4.rotateY(rotMatrix, rotMatrix, this.rotY);
+    mat4.rotateZ(rotMatrix, rotMatrix, this.rotZ);
+    this.device.queue.writeBuffer(this.rotBuffer, 0, <ArrayBuffer>rotMatrix);
 
-    // this.device.queue.writeBuffer(
-    //   this.uniformBuffer,
-    //   0,
-    //   <ArrayBuffer>this.movement
-    // );
+    this.device.queue.writeBuffer(
+      this.uniformBuffer,
+      0,
+      <ArrayBuffer>this.movement
+    );
 
     this.pars[0] = n;
     this.pars[1] = l;
