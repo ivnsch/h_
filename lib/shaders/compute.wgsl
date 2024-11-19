@@ -2,6 +2,7 @@
 @group(0) @binding(1) var<uniform> movement: Movement;
 @group(0) @binding(2) var<uniform> rotation: Rotation;
 @group(0) @binding(3) var<uniform> pars: Pars;
+@group(0) @binding(5) var<uniform> random_rumbers: RandomNumbers;
 
 struct Ray {
     direction: vec3<f32>,
@@ -17,6 +18,11 @@ struct Rotation {
 struct Pars {
     pars: vec3<f32>,
 }
+
+struct RandomNumbers {
+    values: array<vec4<f32>, 100>,
+};
+
 
 @compute @workgroup_size(8,8,1)
 fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
@@ -73,6 +79,12 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     // step back a little, to have a better view
     rotated_3.z -= internal_scaling_factor; 
 
+    // // just one sample per ray
+    // let spheric_coords = to_spheric_coords(rotated_3);
+    // let pd = pd(spheric_coords, u32(pars.pars[0]), u32(pars.pars[1]), i32(pars.pars[2]));
+    // let pd_sum = pd;
+
+    // // integration of evenly spaced samples along ray
     // // collect evenly spaced values along ray
     // let array_length = 100;
     // var pds = array<f32, 100>();
@@ -88,18 +100,41 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     //     // multiply pdf by segment length and store
     //     pds[i] = pd * segment_length;
     // }
-
     // // sum all segments
     // var pd_sum: f32 = 0.0;
     // for (var i = 0; i < array_length; i += 1) {
     //     pd_sum = pd_sum + pds[i];
     // }
-    
-    let spheric_coords = to_spheric_coords(rotated_3);
-    let pd = pd(spheric_coords, u32(pars.pars[0]), u32(pars.pars[1]), i32(pars.pars[2]));
-    let pd_sum = pd;
 
-    // let brightener = 500.0;
+    // monte carlo integration
+    let array_length = 100;
+    var pds = array<f32, 100>();
+    let start = rotated_3.z;
+    let segment_length = 1.0;
+    for (var i = 0; i < array_length; i += 1) {
+        // get random value from ts (can't generate them in wgsl)
+        let x = random_rumbers.values[i][0];
+        let z_offset = f32(x) * segment_length;
+        rotated_3.z = start + z_offset;
+        // calculate pdf
+        let spheric_coords = to_spheric_coords(rotated_3);
+        let pd = pd(spheric_coords, u32(pars.pars[0]), u32(pars.pars[1]), i32(pars.pars[2]));
+        // multiply pdf by segment length and store
+        pds[i] = pd * segment_length;
+    }
+    // sum all segments
+    var pd_sum: f32 = 0.0;
+    for (var i = 0; i < array_length; i += 1) {
+        pd_sum = pd_sum + pds[i];
+    }
+    // divide by N and multiply by volume
+    // volume b-a: this is basically our ray length
+    let volume = f32(array_length) * segment_length;
+    let integration_result = pd_sum / f32(array_length) * volume;
+    // write it to our designated "result" variable
+    pd_sum = integration_result;
+    
+    // let brightener = 100.0;
     let brightener = 10.0;
 
     // map to pixel color

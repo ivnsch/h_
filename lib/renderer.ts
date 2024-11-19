@@ -29,6 +29,8 @@ export class Renderer {
   rotBuffer: GPUBuffer | null;
   parsBuffer: GPUBuffer | null;
   transformationBuffer: GPUBuffer | null;
+  randomNumbersBuffer: GPUBuffer | null;
+  randomNumbers = new Float32Array(400);
 
   movement: vec3 | null;
   rotX: number | null;
@@ -54,6 +56,7 @@ export class Renderer {
     this.parsBuffer = null;
     this.movement = null;
     this.transformationBuffer = null;
+    this.randomNumbersBuffer = null;
     this.rotX = null;
     this.rotY = null;
     this.rotZ = null;
@@ -109,6 +112,10 @@ export class Renderer {
         size: 4 * 4 * 4,
         usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
       });
+      this.randomNumbersBuffer = this.device.createBuffer({
+        size: this.randomNumbers.byteLength,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      });
 
       const ray_tracing_bind_group_layout = this.device.createBindGroupLayout({
         entries: [
@@ -138,6 +145,11 @@ export class Renderer {
           },
           {
             binding: 4,
+            visibility: GPUShaderStage.COMPUTE,
+            buffer: {},
+          },
+          {
+            binding: 5,
             visibility: GPUShaderStage.COMPUTE,
             buffer: {},
           },
@@ -173,6 +185,12 @@ export class Renderer {
             binding: 4,
             resource: {
               buffer: this.transformationBuffer,
+            },
+          },
+          {
+            binding: 5,
+            resource: {
+              buffer: this.randomNumbersBuffer,
             },
           },
         ],
@@ -361,6 +379,15 @@ export class Renderer {
     this.pars[1] = l;
     this.pars[2] = m;
     this.device.queue.writeBuffer(this.parsBuffer, 0, <ArrayBuffer>this.pars);
+
+    for (let i = 0; i < 100; i++) {
+      this.randomNumbers[i * 4] = Math.random(); // Place random value in the first slot
+    }
+    this.device.queue.writeBuffer(
+      this.randomNumbersBuffer,
+      0,
+      this.randomNumbers
+    );
 
     const commandEncoder: GPUCommandEncoder =
       this.device.createCommandEncoder();
