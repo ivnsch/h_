@@ -99,10 +99,23 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     let pd = pd(spheric_coords, u32(pars.pars[0]), u32(pars.pars[1]), i32(pars.pars[2]));
     let pd_sum = pd;
 
+    // let brightener = 500.0;
+    let brightener = 10.0;
+
+    // // map to pixel color
+    // // with transparency
+    // let pd_color = vec4<f32>(0.5, 0.5, 1.0, pd_sum * brightener);
+    // pixel_color = mix(background, pd_color, pd_color.a);
+
     // map to pixel color
-    let brightener = 500.0;
-    let pd_color = vec4<f32>(0.5, 0.5, 1.0, pd_sum * brightener);
-    pixel_color = mix(background, pd_color, pd_color.a);
+    // with brightness bands
+    // might make sense to pass max probability as a parameter
+    let palette: array<vec4<f32>, 301> = create_palette();
+    let max_prob = 0.1; // kind of works (looks ok) for orbitals with max > this
+    let prob_in_range = pd / max_prob;
+    let prob_in_range_int = u32(prob_in_range * 300.);
+    let color = palette[prob_in_range_int];
+    pixel_color = color * brightener;
 
     // pixel_color = background;
     // if pd > 0.001 {
@@ -110,6 +123,21 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     // }
 
     textureStore(color_buffer, screen_pos, pixel_color);
+}
+
+fn create_palette() -> array<vec4<f32>, 301> {
+    let max = 1.;
+    let step = max / f32(301);
+
+    var colors: array<vec4<f32>, 301>;
+    var current = 0.0;
+
+    for (var i = 0; i < 302; i += 1) {
+        colors[i] = vec4<f32>(current, current, 1.0, 1.0);
+        current += step;
+    }
+
+    return colors;
 }
 
 fn to_spheric_coords(coords: vec3<f32>) -> SphericCoords {
