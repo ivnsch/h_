@@ -102,20 +102,20 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     // let brightener = 500.0;
     let brightener = 10.0;
 
-    // // map to pixel color
-    // // with transparency
-    // let pd_color = vec4<f32>(0.5, 0.5, 1.0, pd_sum * brightener);
-    // pixel_color = mix(background, pd_color, pd_color.a);
-
     // map to pixel color
-    // with brightness bands
-    // might make sense to pass max probability as a parameter
-    let palette: array<vec4<f32>, 301> = create_palette();
-    let max_prob = 0.1; // kind of works (looks ok) for orbitals with max > this
-    let prob_in_range = pd / max_prob;
-    let prob_in_range_int = u32(prob_in_range * 300.);
-    let color = palette[prob_in_range_int];
-    pixel_color = color * brightener;
+    // with transparency
+    let pd_color = vec4<f32>(0.5, 0.5, 1.0, pd_sum * brightener);
+    pixel_color = mix(background, pd_color, pd_color.a);
+
+    // // map to pixel color
+    // // with brightness bands
+    // // might make sense to pass max probability as a parameter
+    // let palette: array<vec4<f32>, 301> = create_palette();
+    // let max_prob = 0.1; // kind of works (looks ok) for orbitals with max > this
+    // let prob_in_range = pd / max_prob;
+    // let prob_in_range_int = u32(prob_in_range * 300.);
+    // let color = palette[prob_in_range_int];
+    // pixel_color = color * brightener;
 
     // pixel_color = background;
     // if pd > 0.001 {
