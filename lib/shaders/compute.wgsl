@@ -81,8 +81,8 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
 
     // just one sample per ray
     let spheric_coords = to_spheric_coords(rotated_3);
-    let pd = pd(spheric_coords, u32(pars.pars[0]), u32(pars.pars[1]), i32(pars.pars[2]));
-    let pd_sum = pd;
+    let pd_res = pd(spheric_coords, u32(pars.pars[0]), u32(pars.pars[1]), i32(pars.pars[2]));
+    let pd_sum = pd_res;
 
     // // integration of evenly spaced samples along ray
     // // collect evenly spaced values along ray
